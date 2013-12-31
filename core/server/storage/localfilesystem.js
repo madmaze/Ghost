@@ -4,6 +4,7 @@
 var _       = require('underscore'),
     express = require('express'),
     fs      = require('fs-extra'),
+    im      = require('imagemagick'),
     nodefn  = require('when/node/function'),
     path    = require('path'),
     when    = require('when'),
@@ -31,12 +32,18 @@ localFileStore = _.extend(baseStore, {
             // Move the image to the targetDir
             return nodefn.call(fs.copy, image.path, targetFilename);
         }).then(function () {
+            // Delete the image from temp location
             return nodefn.call(fs.unlink, image.path).otherwise(errors.logError);
         }).then(function () {
             // The src for the image must be in URI format, not a file system path, which in Windows uses \
             // For local file system storage can use relative path so add a slash
             var fullUrl = (config.paths().webroot + '/' + targetFilename).replace(new RegExp('\\' + path.sep, 'g'), '/');
             return saved.resolve(fullUrl);
+        }).then(function () {
+            return baseStore.getUniqueFileName(baseStore, "t_" + image.name, targetDir).then( function (thumbName) {
+                // Downsize image for page-load speed and bandwidth optimization
+                return nodefn.call(im.resize, {srcPath: targetFilename, dstPath: thumbName, width: 800});
+            });
         }).otherwise(function (e) {
             errors.logError(e);
             return saved.reject(e);
