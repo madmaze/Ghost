@@ -39,10 +39,10 @@ baseStore = {
             }
         });
     },
-    'getUniqueFileName': function (store, image, targetDir) {
+    'getUniqueFileName': function (store, imageName, targetDir) {
         var done = when.defer(),
-            ext = path.extname(image.name),
-            name = path.basename(image.name, ext).replace(/[\W]/gi, '_');
+            ext = path.extname(imageName),
+            name = path.basename(imageName, ext).replace(/[\W]/gi, '_');
 
         this.generateUnique(store, targetDir, name, ext, 0, done);
 

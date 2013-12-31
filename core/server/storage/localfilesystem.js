@@ -23,10 +23,12 @@ localFileStore = _.extend(baseStore, {
             targetDir = this.getTargetDir(config.paths().imagesRelPath),
             targetFilename;
 
-        this.getUniqueFileName(this, image, targetDir).then(function (filename) {
+        this.getUniqueFileName(this, image.name, targetDir).then(function (filename) {
             targetFilename = filename;
+            // Make Dir if it doesnt already exist
             return nodefn.call(fs.mkdirs, targetDir);
         }).then(function () {
+            // Move the image to the targetDir
             return nodefn.call(fs.copy, image.path, targetFilename);
         }).then(function () {
             return nodefn.call(fs.unlink, image.path).otherwise(errors.logError);
