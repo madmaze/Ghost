@@ -42,7 +42,8 @@ localFileStore = _.extend(baseStore, {
         }).then(function () {
             return baseStore.getUniqueFileName(baseStore, "t_" + image.name, targetDir).then( function (thumbName) {
                 // Downsize image for page-load speed and bandwidth optimization
-                return nodefn.call(im.resize, {srcPath: targetFilename, dstPath: thumbName, width: 800});
+                // Note: The height arg of '\>' gets passed through to imagemagick to only shrink larger images
+                return nodefn.call(im.resize, {srcPath: targetFilename, dstPath: thumbName, width: 1024, height: '\>'});
             });
         }).otherwise(function (e) {
             errors.logError(e);
